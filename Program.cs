@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using minimal_api;
 using minimal_api.FakeRepositories;
 using minimal_api.Fakers;
 using minimal_api.IRepositories;
@@ -51,5 +52,6 @@ app.MapPost("/customers", (ICustomerRepository customerRepository, Customer cust
 
 app.MapDelete("/customers/{id}", (ICustomerRepository customerRepository, int id) => customerRepository.Remove(id));
 
-    
+app.MapPatch("/customers", (ICustomerRepository customerRepository, Customer customer) => customerRepository.Update(customer));
+
 app.Run();
