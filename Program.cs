@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using minimal_api.FakeRepositories;
 using minimal_api.Fakers;
 using minimal_api.IRepositories;
@@ -13,7 +14,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<Faker<Customer>, CustomerFaker>();
 builder.Services.AddSingleton<ICustomerRepository, FakeCustomerRepository>();
 
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Description = "Docs for my API", Version = "v1" });
+});
+
 var app = builder.Build();
+app.UseSwagger();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
+
 
 if (app.Environment.IsDevelopment())
 {
