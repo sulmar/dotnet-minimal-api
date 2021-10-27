@@ -13,5 +13,6 @@ namespace minimal_api.IRepositories
         void Add(Customer customer);
         void Update(Customer customer);
         void Remove(int id);
+        bool IsExists(int id);
     }
 }

@@ -45,5 +45,7 @@ namespace minimal_api.FakeRepositories
         {
             throw new NotImplementedException();
         }
+
+        public bool IsExists(int id) => customers.Any(c => c.Id == id);
     }
 }

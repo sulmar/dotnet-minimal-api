@@ -9,9 +9,9 @@ namespace minimal_api
 {
     public static class MyMinimalActionEndpointRouteBuilderExtensions
     {
-        public static MinimalActionEndpointConventionBuilder MapPatch(this IEndpointRouteBuilder endpoints, string pattern, Delegate action)
+        public static RouteHandlerBuilder MapPatch(this IEndpointRouteBuilder endpoints, string pattern, Delegate handler)
         {
-            return endpoints.MapMethods(pattern, new string[] { "PATCH" }, action);
+            return endpoints.MapMethods(pattern, new string[] { "PATCH" }, handler);
         }
     }
 }
