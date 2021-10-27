@@ -53,7 +53,9 @@ app.MapGet("/customers/{id}", (ICustomerRepository customerRepository, int id) =
         return Results.NotFound();
 
     return Results.Ok(customer);
-}).WithName("GetCustomerById");
+}).WithName("GetCustomerById")
+.Produces<Customer>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/customers", (ICustomerRepository customerRepository) => customerRepository.Get());
 
@@ -62,7 +64,7 @@ app.MapPost("/customers", (ICustomerRepository customerRepository, Customer cust
     customerRepository.Add(customer);
 
     return Results.CreatedAtRoute("GetCustomerById", new { Id = customer.Id }, customer);
-});
+}).Produces<Customer>(StatusCodes.Status201Created);
 
 app.MapDelete("/customers/{id}", (ICustomerRepository customerRepository, int id) => customerRepository.Remove(id));
 
