@@ -11,6 +11,7 @@ using minimal_api.Fakers;
 using minimal_api.IRepositories;
 using minimal_api.Models;
 using System;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,17 +46,27 @@ app.MapGet("/", () => "Hello World!");
 
 app.MapGet("/api/pi", () => new { Result = Math.PI });
 
-app.MapGet("/customers/{id}", (ICustomerRepository customerRepository, int id) =>
-{
-    var customer = customerRepository.Get(id);
+//app.MapGet("/customers/{id}", (int id, ICustomerRepository customerRepository) =>
+//{
+//    var customer = customerRepository.Get(id);
 
-    if (customer == null)
-        return Results.NotFound();
+//    if (customer == null)
+//        return Results.NotFound();
 
-    return Results.Ok(customer);
-}).WithName("GetCustomerById")
-.Produces<Customer>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status404NotFound);
+//    return Results.Ok(customer);
+//}).WithName("GetCustomerById")
+//.Produces<Customer>(StatusCodes.Status200OK)
+//.Produces(StatusCodes.Status404NotFound);
+
+
+
+app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) => repository.Get(id) switch
+    {
+        Customer customer => Results.Ok(customer),
+        null => Results.NotFound()        
+    })
+    .Produces<Customer>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/customers", (ICustomerRepository customerRepository) => customerRepository.Get());
 
@@ -87,5 +98,22 @@ app.MapPut("/customers", (ICustomerRepository customerRepository, int id, Custom
 });
 
 app.MapPatch("/customers", (ICustomerRepository customerRepository, Customer customer) => customerRepository.Update(customer));
+
+app.MapPost("/api/token", (LoginViewModel model) =>
+{
+    
+    var result = Results.Ok();
+    
+    return result;
+
+});
+
+app.MapGet("/api/items", (ICustomerRepository customerRepository, ClaimsPrincipal user) =>
+{
+    var tenantId = user.FindFirstValue("TenantId");
+    return customerRepository.Get();
+})
+.RequireAuthorization();
+    
 
 app.Run();
