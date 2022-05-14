@@ -59,14 +59,22 @@ app.MapGet("/api/pi", () => new { Result = Math.PI });
 //.Produces(StatusCodes.Status404NotFound);
 
 
-
-app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) => repository.Get(id) switch
-    {
-        Customer customer => Results.Ok(customer),
-        null => Results.NotFound()        
-    })
+app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) =>
+    repository.Get(id)
+        is Customer customer
+        ? Results.Ok(customer)
+        : Results.NotFound())
     .Produces<Customer>(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status404NotFound);
+
+
+//app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) => repository.Get(id) switch
+//    {
+//        Customer customer => Results.Ok(customer),
+//        null => Results.NotFound()        
+//    })
+//    .Produces<Customer>(StatusCodes.Status200OK)
+//    .Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/customers", (ICustomerRepository customerRepository) => customerRepository.Get());
 
@@ -77,7 +85,21 @@ app.MapPost("/customers", (ICustomerRepository customerRepository, Customer cust
     return Results.CreatedAtRoute("GetCustomerById", new { Id = customer.Id }, customer);
 }).Produces<Customer>(StatusCodes.Status201Created);
 
-app.MapDelete("/customers/{id}", (ICustomerRepository customerRepository, int id) => customerRepository.Remove(id));
+app.MapDelete("/customers/{id}", (ICustomerRepository customerRepository, int id) =>
+{
+    if (customerRepository.Get(id) is Customer customer)
+    {
+        customerRepository.Remove(id);
+        return Results.Ok();
+    }
+    else
+    {
+        return Results.NotFound();
+    }
+})
+    .Produces(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status404NotFound);
+
 
 app.MapPut("/customers", (ICustomerRepository customerRepository, int id, Customer customer) =>
 {
@@ -101,9 +123,9 @@ app.MapPatch("/customers", (ICustomerRepository customerRepository, Customer cus
 
 app.MapPost("/api/token", (LoginViewModel model) =>
 {
-    
+
     var result = Results.Ok();
-    
+
     return result;
 
 });
@@ -114,6 +136,6 @@ app.MapGet("/api/items", (ICustomerRepository customerRepository, ClaimsPrincipa
     return customerRepository.Get();
 })
 .RequireAuthorization();
-    
+
 
 app.Run();
