@@ -59,6 +59,7 @@ app.MapGet("/api/pi", () => new { Result = Math.PI });
 //.Produces(StatusCodes.Status404NotFound);
 
 
+// Z u¿yciem operatora is
 app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) =>
     repository.Get(id)
         is Customer customer
@@ -67,7 +68,7 @@ app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) =>
     .Produces<Customer>(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status404NotFound);
 
-
+// Z u¿yciem operatora switch
 //app.MapGet("/customers/{id}", (int id, ICustomerRepository repository) => repository.Get(id) switch
 //    {
 //        Customer customer => Results.Ok(customer),
